@@ -130,8 +130,7 @@ var AppModule = /** @class */ (function () {
                 _app_component__WEBPACK_IMPORTED_MODULE_2__["AppComponent"]
             ],
             imports: [
-                _angular_router__WEBPACK_IMPORTED_MODULE_6__["RouterModule"].forRoot(_routes_routes__WEBPACK_IMPORTED_MODULE_7__["routes"] // <-- debugging purposes only
-                ),
+                _angular_router__WEBPACK_IMPORTED_MODULE_6__["RouterModule"].forRoot(_routes_routes__WEBPACK_IMPORTED_MODULE_7__["routes"]),
                 _angular_platform_browser__WEBPACK_IMPORTED_MODULE_0__["BrowserModule"],
                 _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpClientModule"],
                 _home_home_module__WEBPACK_IMPORTED_MODULE_3__["HomeModule"],
@@ -187,7 +186,7 @@ var AuthGuardService = /** @class */ (function () {
                     resolve(x);
                 }
                 else {
-                    _this.router.navigate(['login']);
+                    _this.auth.login();
                     resolve(x);
                 }
             });
@@ -215,7 +214,8 @@ var AuthGuardService = /** @class */ (function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AuthService", function() { return AuthService; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _external_services_pustak_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../external_services/pustak.service */ "./src/app/external_services/pustak.service.ts");
+/* harmony import */ var auth0_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! auth0-js */ "./node_modules/auth0-js/dist/auth0.min.esm.js");
+/* harmony import */ var _external_services_pustak_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../external_services/pustak.service */ "./src/app/external_services/pustak.service.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -227,9 +227,17 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 };
 
 
+
 var AuthService = /** @class */ (function () {
     function AuthService(pustakService) {
         this.pustakService = pustakService;
+        this.auth0 = new auth0_js__WEBPACK_IMPORTED_MODULE_1__["WebAuth"]({
+            clientID: 'z3ciAhcUv9DQ6Q39B495Lk9Jgb4ZlNUU',
+            domain: 'noteswebapp.auth0.com',
+            responseType: 'token id_token',
+            redirectUri: 'http://localhost:4200/notebook',
+            scope: 'openid'
+        });
     }
     AuthService.prototype.isAuthorized = function () {
         if (sessionStorage.getItem('auth-token')) {
@@ -239,9 +247,12 @@ var AuthService = /** @class */ (function () {
             return Promise.resolve(false);
         }
     };
+    AuthService.prototype.login = function () {
+        this.auth0.authorize();
+    };
     AuthService = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
-        __metadata("design:paramtypes", [_external_services_pustak_service__WEBPACK_IMPORTED_MODULE_1__["PustakService"]])
+        __metadata("design:paramtypes", [_external_services_pustak_service__WEBPACK_IMPORTED_MODULE_2__["PustakService"]])
     ], AuthService);
     return AuthService;
 }());
@@ -1091,12 +1102,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "routes", function() { return routes; });
 /* harmony import */ var _home_home_component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../home/home.component */ "./src/app/home/home.component.ts");
 /* harmony import */ var _errors_pagenotfound_component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../errors/pagenotfound.component */ "./src/app/errors/pagenotfound.component.ts");
-/* harmony import */ var _auth_AuthGuardService__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../auth/AuthGuardService */ "./src/app/auth/AuthGuardService.ts");
+/* harmony import */ var _notebook_notebook_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../notebook/notebook.component */ "./src/app/notebook/notebook.component.ts");
+/* harmony import */ var _auth_AuthGuardService__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../auth/AuthGuardService */ "./src/app/auth/AuthGuardService.ts");
+
 
 
 
 var routes = [
-    { path: '', component: _home_home_component__WEBPACK_IMPORTED_MODULE_0__["HomeComponent"], canActivate: [_auth_AuthGuardService__WEBPACK_IMPORTED_MODULE_2__["AuthGuardService"]] },
+    { path: 'notebook', component: _notebook_notebook_component__WEBPACK_IMPORTED_MODULE_2__["NoteBookComponent"] },
+    { path: '', component: _home_home_component__WEBPACK_IMPORTED_MODULE_0__["HomeComponent"], canActivate: [_auth_AuthGuardService__WEBPACK_IMPORTED_MODULE_3__["AuthGuardService"]] },
     { path: '**', component: _errors_pagenotfound_component__WEBPACK_IMPORTED_MODULE_1__["PageNotFoundComponent"] }
 ];
 
